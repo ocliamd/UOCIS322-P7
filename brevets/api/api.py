@@ -4,7 +4,6 @@ from bson import json_util
 import json
 import db # Database operations
 import os
-#from passlib.apps import custom_app_context as pwd_context
 from passlib.hash import sha256_crypt as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer \
                                   as Serializer, BadSignature, \
@@ -21,7 +20,7 @@ parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, help="Need an username!")
 parser.add_argument('password', required=True, help="Need a password!")
 
-SECRET_KEY = "nobodyknowsthekey272781239@#!"
+SECRET_KEY = "test1234@#$"
 
 def _csv(rows):
     h = list(rows[0].keys())
@@ -34,10 +33,10 @@ def _csv(rows):
 def hash_password(password):
     return pwd_context.using(salt="somestring").encrypt(password)
 
-def verify_password(password, hashVal):
+def check_password(password, hashVal):
     return pwd_context.verify(password, hashVal)
 
-def generate_auth_token(id, expiration=600):
+def generate_auth_token(id, expiration=60):
    s = Serializer(SECRET_KEY, expires_in=expiration)
    return s.dumps({'id': id})
 
@@ -63,9 +62,9 @@ class register(Resource):
         if len(client.f_find([], {'username': info['username']})) == 0:
             info['id'] = client.generate_id()
             client.insert(info)
-            return "Registrarion Successful!", 201
+            return "Registrarion is successful!", 201
         else:
-            return abort(400, "This account has already been created!")
+            return abort(400, "This account has already been created")
 
 
 class token(Resource):
@@ -74,15 +73,15 @@ class token(Resource):
         username = request.args.get("username", default="")
         password = request.args.get("password", default="")
         if username == "" or password == "":
-            return abort(400, "Need both username and password!")
+            return abort(400, "Need both a username and a password")
         info = client.f_find(["id", "password"], {'username': username})
         if info:
             info = info[0]
             id = info["id"]
-            auth = {"id": id, "duration": 600}
+            auth = {"id": id, "duration": 60}
             hashed_ = info["password"]
-            app.logger.debug(f"password: {password}, hashed: {hashed_}, verify: {verify_password(password, hashed_)}")
-            if verify_password(password, hashed_):
+            app.logger.debug(f"password: {password}, hashed: {hashed_}, verify: {check_password(password, hashed_)}")
+            if check_password(password, hashed_):
                 auth["token"] = generate_auth_token(id).decode("utf-8")
                 return json.dumps(auth), 201
             return abort(400, "Incorrect password. Please try again!")
@@ -91,7 +90,7 @@ class token(Resource):
 
 
 class listAll(Resource):
-    def get(self, option="", dtype=""):
+    def get(self, option="", data_type=""):
         client.set_collection("latestsubmit")
         top = int(request.args.get("top", default=-1))
         # Get the argument token; default value will be ""
@@ -106,27 +105,27 @@ class listAll(Resource):
             elif option == "CloseOnly":
                 fields = ["km", "close"]
             else:
-                return "The only possible options are listAll, listOpenOnly, listCloseOnly!"
+                return "The only options availible are list all, list open, list close"
 
             if top > 0:
                 rows = client.f_top(fields, top)
             elif top == -1:
                 rows = client.f_find(fields)
             else:
-                return "Need to enter a positive integer for top!"
+                return "Need to enter a positive integer for the top"
             if len(rows) == 0:
-                return "The database is empty. Please, input the control time."
-            if dtype == 'csv':
+                return "The database is currently empty. Please, input the control time on the brevet calculator"
+            if data_type == 'csv':
                 result = _csv(rows)
-            elif dtype == 'json' or dtype == "":
+            elif data_type == 'json' or data_type == "":
                 result = json.loads(json_util.dumps(rows))
             else:
-                result = "The data can be displayed in both csv or json format. Try 'csv' or 'json'."
+                result = "The data can be displayed in both csv or json format. Try either a 'csv' or a 'json'"
             return result
 
 #############
 
-api.add_resource(listAll, '/list<string:option>', '/list<string:option>/<string:dtype>')
+api.add_resource(listAll, '/list<string:option>', '/list<string:option>/<string:data_type>')
 api.add_resource(register, '/register')
 api.add_resource(token, '/token')
 
