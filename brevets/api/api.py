@@ -37,7 +37,7 @@ def hash_password(password):
 def verify_password(password, hashVal):
     return pwd_context.verify(password, hashVal)
 
-def generate_auth_token(id, expiration=600):
+def generate_auth_token(id, expiration=60):
    s = Serializer(SECRET_KEY, expires_in=expiration)
    return s.dumps({'id': id})
 
