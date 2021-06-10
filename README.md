@@ -11,41 +11,6 @@ You have a minimal implementation of password- and token-based authentication mo
 
 **MAKE SURE TO KEEP YOUR FILES in `brevets`! REMOVE `DockerRestAPI` after you're done!**
 
-## Getting started 
-
-You will reuse *your* code from Project 6.
-
-Recall: you created the following three parts: 
-
-* You designed RESTful services to expose what is stored in MongoDB, and created the following:
-
-** "http://<host:port>/listAll" should return all open and close times in the database
-
-** "http://<host:port>/listOpenOnly" should return open times only
-
-** "http://<host:port>/listCloseOnly" should return close times only
-
-* You also designed two different representations: one in csv and one in json. For the above, JSON should be your default representation. 
-
-** "http://<host:port>/listAll/csv" should return all open and close times in CSV format
-
-** "http://<host:port>/listOpenOnly/csv" should return open times only in CSV format
-
-** "http://<host:port>/listCloseOnly/csv" should return close times only in CSV format
-
-** "http://<host:port>/listAll/json" should return all open and close times in JSON format
-
-** "http://<host:port>/listOpenOnly/json" should return open times only in JSON format
-
-** "http://<host:port>/listCloseOnly/json" should return close times only in JSON format
-
-* You also added a query parameter to get top "k" open and close times. For examples, see below.
-
-** "http://<host:port>/listOpenOnly/csv?top=3" should return top 3 open times only (in ascending order) in CSV format 
-
-** "http://<host:port>/listOpenOnly/json?top=5" should return top 5 open times only (in ascending order) in JSON format
-
-* You'll also designed consumer programs (e.g., in jQuery) to expose the services.
 
 ### Functionality you will add
 
@@ -72,29 +37,3 @@ The goal of this part of the project is to create frontend/UI for Brevet app usi
 #### Summary
 You will still maintain your `brevetsapp` service, and `mongodb` service that you've had since project 5, that will remain UNCHANGED.
 
-## Tasks
-
-You'll turn in your credentials.ini using which we will get the following:
-
-* The working application with two parts.
-
-* Dockerfile
-
-* docker-compose.yml
-
-## Grading Rubric
-
-* If your code works as expected: 100 points. This includes:
-    * Basic APIs work as expected in part 1.
-    * Decent user interface in part 2 including the three functionalities in the UI.
-
-* For each non-working API in part 1, 15 points will be docked off. Part 1 carries 45 points.
-
-* For the UI and the three functionalies, decent UI carries 15 points. Each functionality carries 10 points. In short, part 2 carries 45 points.
-
-* If none of them work, you'll get 10 points assuming
-    * `README` is updated with your name and email ID.
-    * `credentials.ini` is submitted with the correct URL of your repo.
-    * `docker-compose.yml` works/builds without any errors.
-
-* If the `docker-compose.yml` doesn't build or if `credentials.ini` is missing, 0 will be assigned.
