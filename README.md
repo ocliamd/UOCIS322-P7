@@ -1,39 +1,18 @@
 # UOCIS322 - Project 7 #
-Adding authentication and user interface to brevet time calculator service
-
-## What is in this repository
-
-You have a minimal implementation of password- and token-based authentication modules in `DockerAuth` directory, and login forms in `DockerLogin`, using which you can create authenticated REST API-based services (as demonstrated in class), as well as a front end. 
-
-## IMPORTANT NOTES
-
-**MAKE SURE TO USE THE SOLUTION `acp_times.py` from Canvas for this project!**
-
-**MAKE SURE TO KEEP YOUR FILES in `brevets`! REMOVE `DockerRestAPI` after you're done!**
 
 
-### Functionality you will add
+# User 
 
-In this project, you will add the following functionalities:
+Each user will be required to make an account with a password greater than eight characters. They can then login. If their token signature expires or they have a bad token signature the service will redirect them to the index page along with the message pertaining to why they were redirected.
 
-#### Part 1: Authenticating the services 
+# Functionality
+The algorithm uses the French calculation for KM 0-60, each brevet has the same open and close time as well as up to 20% past. Each specific brevet has a unique max, these are in hours and minutes: HH:MM 3:30 for 200 KM, 20:00 for 300 KM, 27:00 for 400 KM, 40:00 for 600 KM, and 75:00 for 1000 KM. Each of the starting times is relative to the previous starting times, and this is the same for the to the closing times.
 
-- POST **/register**
+The program now accepts valid inputs into a database. If the user attempts to submit an invalid value nothing will be added to the data base, and an error message will be pop up on the user's screen. If the user displays from an empty database another error will be popped up on the users screen.
 
-Registers a new user. On success a status code 201 is returned. The body of the response contains a JSON object with the newly added user. On failure status code 400 (bad request) is returned. Note: The password is hashed before it is stored in the database. Once hashed, the original password is discarded. Your database should have three fields: id (unique index), username and password for storing the credentials.
+This program also now has a RESTful api service which allows the user to choose what parts of the input data will be returned back to them via a new webpage.
 
-- GET **/token**
+docker-compose.yml file runs 3 separate containers as well as the MongoDB database.
 
-Returns a token. This request must be authenticated using a HTTP Basic Authentication (see `DockerAuth/password.py` and `DockerAuth/testToken.py`). On success a JSON object is returned with a field `token` set to the authentication token for the user and a field `duration` set to the (approximate) number of seconds the token is valid. On failure status code 401 (unauthorized) is returned.
-
-- GET **/RESOURCE-YOU-CREATED-IN-PROJECT-6**
-
-Return a protected <resource>, which is basically what you created in project 6. This request must be authenticated using token-based authentication only (see `DockerAuth/testToken.py`). HTTP password-based (basic) authentication is not allowed. On success a JSON object with data for the authenticated user is returned. On failure status code 401 (unauthorized) is returned.
-
-#### Part 2: User interface
-
-The goal of this part of the project is to create frontend/UI for Brevet app using Flask-WTF and Flask-Login introduced in lectures. You frontend/UI should use the authentication that you created above. In addition to creating UI for basic authentication and token generation, you will add three additional functionalities in your UI: a) registration, b) login, c) remember me, d) logout.
-
-#### Summary
-You will still maintain your `brevetsapp` service, and `mongodb` service that you've had since project 5, that will remain UNCHANGED.
+If the top "k" value is out of range of the top times it displays all of the inputted times. This will include bothnegative and positive values. If k = 0 it displays nothing for all api access's.
 
