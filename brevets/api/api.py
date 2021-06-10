@@ -79,7 +79,7 @@ class token(Resource):
         if info:
             info = info[0]
             id = info["id"]
-            auth = {"id": id, "duration": 600}
+            auth = {"id": id, "duration": 60}
             hashed_ = info["password"]
             app.logger.debug(f"password: {password}, hashed: {hashed_}, verify: {verify_password(password, hashed_)}")
             if verify_password(password, hashed_):
