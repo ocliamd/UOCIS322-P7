@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+    <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
+    <style>
+        .button {
+            color: black;
+            border-radius: 5px;
+            height: 30px;
+        }
+        .option_format {
+            font-weight: bold;
+            margin-left: 15px;
+            margin-top: 5px;
+        }
+        .display {
+            margin-bottom: 10px;
+            margin-left: 15px;
+            color: darkslategray;
+        }
+        .frame {
+            margin-top: 20px;
+            color: black;
+            padding: 20px;
+            width: 530px;
+            height: 100px;
+        }
+    </style>
+    <div class="container">
+        <h1 class="frame">ACP Control Times Display</h1>
+        <form style="margin-bottom:10px;">
+            Display all the open and close times in
+            <select name="datatype1" id="datatype1" required>
+                <option value="none" selected disabled hidden>
+                    Options:
+                </option>
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+            </select>
+            format.
+            <button type="button" class="button" onclick="retrieve('1')">Submit</button>
+        </form>
+        <pre class="display" id="display1"><code></code></pre>
+        <form style="margin-bottom:10px;">
+            Display all the open times as
+            <select name="datatype2" id="datatype2" required>
+                <option value="none" selected disabled hidden>
+                    Options:
+                </option>
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+            </select>
+            format.
+            <button type="button" class="button" onclick="retrieve(2)">Submit</button>
+        </form>
+        <pre class="display" id="display2"></pre>
+        <form style="margin-bottom:10px;">
+            Display all the close times as
+            <select name="datatype3" id="datatype3" required>
+                <option value="none" selected disabled hidden>
+                    Options:
+                </option>
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+            </select>
+            format.
+            <button type="button" class="button" onclick="retrieve(3)">Submit</button>
+        </form>
+        <pre class="display" id="display3"></pre>
+        <form>
+            Display the first
+            <input type="text" size="3" id="top" required>
+            <select name="displaytype" id="displaytype" required>
+                <option value="none" selected disabled hidden>
+                    Options:
+                </option>
+                <option value="both">open and close times</option>
+                <option value="open">open times</option>
+                <option value="close">close times</option>
+                <!--<input type="submit" value="Submit"> -->
+            </select>
+            in
+            <select name="datatype4" id="datatype4" required>
+                <option value="none" selected disabled hidden>
+                    Options:
+                </option>
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+            </select>
+            format.
+            <button type="button" class="button" onclick="retrieve(4)">Submit</button>
+        </form>
+        <pre class="display" id="display4"></pre>
+        <script>
+            var SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            var LIST_ALL = SCRIPT_ROOT + "/listAll";
+            var LIST_OPEN = SCRIPT_ROOT + "/listOpenOnly";
+            var LIST_CLOSE = SCRIPT_ROOT + "/listCloseOnly";
+            console.log(LIST_ALL);
+
+            function retrieve(option){
+                var datatype_id = "#datatype" + option;
+                var display_id = "display" + option;
+                var datatype_val = $(datatype_id).val();
+                var display = document.getElementById(display_id)
+                var displaytype_val = $("#displaytype").val()
+                var top_k = $("#top").val();
+                var error = false;
+
+                if (option == "4") {
+                    if (error == false && (top_k == "" || parseInt(top_k) <= 0)) {
+                        error = true;
+                        alert("Need to type in a positive integer in the textbox!");
+                    }
+                    if (error == false && displaytype_val == null) {
+                        error = true;
+                        alert("Select at least one option");
+                    }
+                }
+                else {
+                    if (top_k == "") {
+                        top_k = "0";
+                    }
+
+                }
+                if (error == false && datatype_val == null) {
+                    error = true;
+                    alert("Select at least one option");
+                }
+                if (error == false) {
+                    if (option == "1" || (option == "4" && displaytype_val == "both")) {
+                        $.getJSON(LIST_ALL, {top: top_k, datatype: $(datatype_id).val()}).done(
+                            function(data) {
+                                if (data.result == "empty") {
+                                    alert("Database is empty, submit at least one time on the calculator.");
+                                }
+                                else {
+                                    display.innerHTML = data.result;
+                                }
+                            }
+                        ).fail(function(err){
+                            console.log("Error!");
+                        });
+                    }
+                    else if (option == "2" || (option == "4" && displaytype_val == "open")) {
+                        $.getJSON(LIST_OPEN, {top: top_k, datatype: $(datatype_id).val()}).done(
+                            function(data) {
+                                if (data.result == "empty") {
+                                    alert("Database is empty, submit at least one time on the calculator.");
+                                }
+                                else {
+                                    display.innerHTML = data.result;
+                                }
+                            }
+                        ).fail(function(err){
+                            console.log("Error!");
+                        });
+                    }
+                    else if (option == "3" || (option == "4" && displaytype_val == "close")) {
+                        $.getJSON(LIST_CLOSE, {top: top_k, datatype: $(datatype_id).val()}).done(
+                            function(data) {
+                                if (data.result == "empty") {
+                                    alert("Database is empty, submit at least one time on the calculator.");
+                                }
+                                else {
+                                    display.innerHTML = data.result;
+                                }
+                            }
+                        ).fail(function(err){
+                            console.log("Error!");
+                        });
+                    }
+                }
+            }
+
+        </script>
+    </div>
+{% endblock %}
